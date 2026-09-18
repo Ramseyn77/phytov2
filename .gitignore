@@ -1,0 +1,8 @@
+dataset/
+dataset_seg/
+dataset.rar
+yolov8n-seg.pt
+__pycache__/
+*.keras
+*.tflite
+yy
