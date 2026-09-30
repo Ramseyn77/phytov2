@@ -1,4 +1,4 @@
-﻿"""
+"""
 model.py
 ========
 Architecture PhytoV2 : Transfer Learning EfficientNetV2B0
@@ -151,7 +151,7 @@ def get_callbacks(checkpoint_dir: str = "checkpoints", phase: int = 1):
     """
     Path(checkpoint_dir).mkdir(parents=True, exist_ok=True)
 
-    return [
+    callbacks = [
         tf.keras.callbacks.ModelCheckpoint(
             filepath       = str(Path(checkpoint_dir) / f"phase{phase}_best.keras"),
             monitor        = "val_accuracy",
@@ -172,11 +172,19 @@ def get_callbacks(checkpoint_dir: str = "checkpoints", phase: int = 1):
             min_lr   = 1e-7,
             verbose  = 1,
         ),
-        tf.keras.callbacks.TensorBoard(
-            log_dir        = f"logs/phase{phase}",
-            histogram_freq = 1,
-        ),
     ]
+
+    try:
+        callbacks.append(
+            tf.keras.callbacks.TensorBoard(
+                log_dir        = f"logs/phase{phase}",
+                histogram_freq = 1,
+            )
+        )
+    except Exception:
+        pass
+
+    return callbacks
 
 
 # ---------------------------------------------
