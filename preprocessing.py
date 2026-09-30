@@ -346,13 +346,17 @@ def build_tf_dataset(
 
     # CutMix
     if apply_cutmix:
-        def apply_cutmix(images, labels):
-            return tf.py_function(
-                func=lambda imgs, lbls: cutmix_batch(imgs, lbls, cutmix_alpha),
-                inp =[images, labels],
+        def apply_cutmix_wrapper(images, labels):
+            imgs, lbls = tf.py_function(
+                func=lambda i, l: cutmix_batch(i, l, cutmix_alpha),
+                inp=[images, labels],
                 Tout=[tf.float32, tf.float32],
             )
-        ds = ds.map(apply_cutmix, num_parallel_calls=tf.data.AUTOTUNE)
+            imgs.set_shape([None, IMAGE_SIZE[0], IMAGE_SIZE[1], 3])
+            lbls.set_shape([None, num_classes])
+            return imgs, lbls
+
+        ds = ds.map(apply_cutmix_wrapper, num_parallel_calls=tf.data.AUTOTUNE)
 
     # Prefetch
     ds = ds.prefetch(tf.data.AUTOTUNE)
